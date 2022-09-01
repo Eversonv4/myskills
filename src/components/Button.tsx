@@ -1,7 +1,11 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
-export function Button({ addSkill }) {
+interface AddSkill {
+  addSkill: () => void;
+}
+
+export function Button({ addSkill }: AddSkill) {
   return (
     <TouchableOpacity
       onPress={addSkill}

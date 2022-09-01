@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   StyleSheet,
@@ -7,34 +7,65 @@ import {
   TextInput,
   Platform,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 
 import { Button } from "../components/Button";
 import { SkillCard } from "../components/SkillCard";
 
+interface SkillData {
+  id: string;
+  nameSkill: string;
+}
+
 export function Home() {
   const [newSkill, setNewSkill] = useState("");
-  const [mySkills, setMySkills] = useState([]);
+  const [mySkills, setMySkills] = useState<SkillData[]>([]);
+  const [greeting, setGreeting] = useState("");
 
   function handleAddNewSkill() {
-    setMySkills((oldState) => [...oldState, newSkill]);
+    if (newSkill === "") {
+      return;
+    }
+
+    const data = {
+      id: String(new Date().getTime()),
+      nameSkill: newSkill,
+    };
+
+    setMySkills((oldState) => [...oldState, data]);
     setNewSkill("");
   }
 
-  function handleRemoveSkill(skillName) {
-    const response = mySkills.filter((skill) => skill !== skillName);
+  function handleRemoveSkill(skillId: string) {
+    const response = mySkills.filter((skill) => skill.id !== skillId);
 
     setMySkills(response);
   }
 
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+
+    if (currentHour < 12) {
+      setGreeting("Good Morning!");
+    } else if (currentHour < 18) {
+      setGreeting("Good Afternoon!");
+    } else {
+      setGreeting("Good Night!");
+    }
+  }, [mySkills]);
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Welcome, Everson!</Text>
+
+      <Text style={styles.greetings}>{greeting}</Text>
+
       <TextInput
         style={styles.input}
         placeholder="New Skill"
         placeholderTextColor="#555"
-        type="text"
+        //   keyboardType="numeric"
         value={newSkill}
         onChangeText={setNewSkill}
       />
@@ -43,16 +74,13 @@ export function Home() {
 
       <Text style={[styles.title, { marginTop: 50 }]}>My Skills</Text>
 
-      <ScrollView>
-        {mySkills.length > 0 &&
-          mySkills.map((skill) => (
-            <SkillCard
-              skill={skill}
-              key={skill}
-              removeSkill={handleRemoveSkill}
-            />
-          ))}
-      </ScrollView>
+      <FlatList
+        data={mySkills}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <SkillCard skill={item} removeSkill={handleRemoveSkill} />
+        )}
+      />
     </SafeAreaView>
   );
 }
@@ -76,5 +104,8 @@ const styles = StyleSheet.create({
     padding: Platform.OS === "ios" ? 15 : 10,
     marginTop: 30,
     borderRadius: 7,
+  },
+  greetings: {
+    color: "#fff",
   },
 });
