@@ -70,7 +70,7 @@ export function Home() {
         onChangeText={setNewSkill}
       />
 
-      <Button addSkill={handleAddNewSkill} />
+      <Button title="Add" onPress={handleAddNewSkill} />
 
       <Text style={[styles.title, { marginTop: 50 }]}>My Skills</Text>
 
@@ -78,7 +78,7 @@ export function Home() {
         data={mySkills}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <SkillCard skill={item} removeSkill={handleRemoveSkill} />
+          <SkillCard skill={item} onPress={() => handleRemoveSkill(item.id)} />
         )}
       />
     </SafeAreaView>
